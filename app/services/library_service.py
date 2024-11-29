@@ -15,13 +15,24 @@ class LibraryService:
 
     async def create_book(
         self,
-        library: Library
-    ) -> LibraryOut:
-        self._session.add(library)
+        title: str,
+        author: str,
+        year: int,
+        #library: Library
+    ) -> Library:
+        object = Library(
+            title=title,
+            author=author,
+            year=year,
+            )
+        self._session.add(object)
         await self._session.commit()
-        return LibraryOut.model_validate(obj=library)
+        return object
 
-    async def get_all(self) -> list[LibraryOut]:
+    async def get_all(self) -> Library:
         stmt = select(Library)
-        object = (await self._session.scalars(stmt)).all()
-        return LibraryOut.model_validate(obj=object)
+        objects = (await self._session.scalars(stmt)).all()
+        return LibraryOut.model_validate_list(objs=objects)
+        #return object
+
+    

@@ -13,7 +13,8 @@ async def get_all_books(
 
 ) -> list[LibraryOut]:
     object = await services.get_all()
-    return LibraryOut.model_validate(object)
+    #object = await services.get_all()
+    return object
 
 
 @library_router.post("/book")
@@ -21,9 +22,9 @@ async def create_book(
     book_data: LibraryInput,
     services: LibraryService = Depends(get_library_service),
 ) -> LibraryOut:
-
-    return await services.create_book(
+    new_book = await services.create_book(
         title=book_data.title,
-        autor=book_data.author,
+        author=book_data.author,
         year=book_data.year,
     )
+    return LibraryOut.model_validate(new_book, from_attributes=True)
