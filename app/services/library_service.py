@@ -33,6 +33,24 @@ class LibraryService:
         stmt = select(Library)
         objects = (await self._session.scalars(stmt)).all()
         return LibraryOut.model_validate_list(objs=objects)
-        #return object
 
-    
+    async def get_book_by_id(
+        self,
+        id,
+    ) -> Library | None:
+        book = await self._session.get(Library, ident=id)
+        if book is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Book with id={id} is not found",
+                )
+        return book
+
+    async def delete_book(
+        self,
+        id: int,
+    ) -> None:
+        book = await self.get_book_by_id(id=id)
+        await self._session.delete(book)
+        await self._session.commit()
+        return None

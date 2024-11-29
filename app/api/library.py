@@ -28,3 +28,15 @@ async def create_book(
         year=book_data.year,
     )
     return LibraryOut.model_validate(new_book, from_attributes=True)
+
+
+@library_router.delete(
+    "/{id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_book(
+    id: int,
+    service: LibraryService = Depends(get_library_service),
+) -> None:
+    await service.delete_book(id=id)
+    return None
