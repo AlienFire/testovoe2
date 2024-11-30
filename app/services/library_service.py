@@ -32,7 +32,7 @@ class LibraryService:
     async def get_all(self) -> Library:
         stmt = select(Library)
         objects = (await self._session.scalars(stmt)).all()
-        return LibraryOut.model_validate_list(objs=objects)
+        return LibraryOut.model_validate(obj=objects)
 
     async def get_book_by_id(
         self,
@@ -54,3 +54,29 @@ class LibraryService:
         await self._session.delete(book)
         await self._session.commit()
         return None
+
+    async def get_book(
+        self,
+        title: str | None,
+        author: str | None,
+        year: int | None,
+    ) -> list[LibraryOut]:
+        title_query = ""
+        author_query = ""
+
+        if title is not None:
+            title_query = title
+        if author is not None:
+            author_query = author
+        if year is not None:
+            stmt = select(Library).where(
+                Library.author == author_query
+                or Library.title == title_query
+                or Library.year == year)
+            objects = (await self._session.scalars(stmt)).all()
+        else:
+            stmt = select(Library).where(
+                Library.author == author_query
+                or Library.title == title_query)
+            objects = (await self._session.scalars(stmt)).all()
+        return LibraryOut.model_validate(obj=objects)

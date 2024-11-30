@@ -40,3 +40,18 @@ async def delete_book(
 ) -> None:
     await service.delete_book(id=id)
     return None
+
+
+@library_router.get("/")
+async def get_book(
+    title: str | None,
+    author: str | None,
+    year: int | None,
+    service: LibraryService = Depends(get_library_service),
+) -> list[LibraryOut]:
+    books = await service.get_book(
+        title=title,
+        author=author,
+        year=year,
+        )
+    return books
