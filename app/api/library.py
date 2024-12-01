@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, status
 
+from app.contracts import  StatusBookEnum
 from app.schema import LibraryInput, LibraryOut
 from app.di.services import get_library_service
 from app.services.library_service import LibraryService
@@ -42,7 +43,9 @@ async def delete_book(
     return None
 
 
-@library_router.get("/")
+@library_router.get("/",
+                    description="You can find the book by title, author or year",
+                    )
 async def get_book(
     title: str | None,
     author: str | None,
@@ -55,3 +58,21 @@ async def get_book(
         year=year,
         )
     return books
+
+
+
+@library_router.put(
+    "/{id}",
+    description="You can change the status of book"
+)
+async def change_status_of_book(
+    id: int,
+    status: StatusBookEnum,
+    service: LibraryService = Depends(get_library_service),
+) -> LibraryOut:
+
+    update_book = await service.update_book(
+        id=id,
+        stutus=status,
+    )
+    return LibraryOut.model_validate(update_book, from_attributes=True)

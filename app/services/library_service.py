@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.contracts import StatusBookEnum
 from app.db.models import Library
 from app.schema import (
     LibraryInput,
@@ -80,3 +81,14 @@ class LibraryService:
                 or Library.title == title_query)
             objects = (await self._session.scalars(stmt)).all()
         return LibraryOut.model_validate(obj=objects)
+
+    async def update_book(
+        self,
+        id: int,
+        stutus: StatusBookEnum,
+    ) -> Library:
+        book = await self.get_book_by_id(id=id)
+        book.status = stutus
+        self._session.add(book)
+        await self._session.commit()
+        return book
