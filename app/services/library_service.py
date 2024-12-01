@@ -19,8 +19,8 @@ class LibraryService:
         title: str,
         author: str,
         year: int,
-        #library: Library
     ) -> Library:
+        """Добавление новой книги"""
         object = Library(
             title=title,
             author=author,
@@ -31,6 +31,7 @@ class LibraryService:
         return object
 
     async def get_all(self) -> Library:
+        """Получение списка всех книг"""
         stmt = select(Library)
         objects = (await self._session.scalars(stmt)).all()
         return LibraryOut.model_validate(obj=objects)
@@ -39,6 +40,7 @@ class LibraryService:
         self,
         id,
     ) -> Library | None:
+        """Поиск книги по id"""
         book = await self._session.get(Library, ident=id)
         if book is None:
             raise HTTPException(
@@ -51,6 +53,7 @@ class LibraryService:
         self,
         id: int,
     ) -> None:
+        """Удаление книги по id"""
         book = await self.get_book_by_id(id=id)
         await self._session.delete(book)
         await self._session.commit()
@@ -62,6 +65,7 @@ class LibraryService:
         author: str | None,
         year: int | None,
     ) -> list[LibraryOut]:
+        """Поиск книг по названию, автору или году"""
         title_query = ""
         author_query = ""
 
@@ -87,6 +91,7 @@ class LibraryService:
         id: int,
         stutus: StatusBookEnum,
     ) -> Library:
+        """Изменение статуса книги по id"""
         book = await self.get_book_by_id(id=id)
         book.status = stutus
         self._session.add(book)

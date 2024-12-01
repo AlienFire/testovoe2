@@ -8,17 +8,18 @@ from app.services.library_service import LibraryService
 library_router = APIRouter()
 
 
-@library_router.get("/")
+@library_router.get("/",
+                    description="You can get all books",
+                    )
 async def get_all_books(
     services: LibraryService = Depends(get_library_service),
 
 ) -> list[LibraryOut]:
     object = await services.get_all()
-    #object = await services.get_all()
     return object
 
 
-@library_router.post("/book")
+@library_router.post("/book", description="You can add new book")
 async def create_book(
     book_data: LibraryInput,
     services: LibraryService = Depends(get_library_service),
